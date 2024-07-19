@@ -32,7 +32,7 @@ Vue.use(Plugin)
 <style src="quasar-ui-qui-plus/dist/index.css"></style>
 
 <script>
-import { Component as BuildForm } from 'quasar-ui-qui-plus'
+import { BuildForm } from 'quasar-ui-qui-plus'
 
 export default {
   
@@ -61,7 +61,7 @@ Vue.use(Plugin)
 <style src="quasar-ui-qui-plus/dist/index.css"></style>
 
 <script>
-import { Component as BuildForm } from 'quasar-ui-qui-plus'
+import { BuildForm } from 'quasar-ui-qui-plus'
 
 export default {
   

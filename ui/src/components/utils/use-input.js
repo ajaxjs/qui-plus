@@ -1,6 +1,5 @@
 import { h } from 'vue'
-import { QBtn, QField, QInput, QFile, QSelect, QOptionGroup, QSlider, QRange, QDate, QPopupProxy, QEditor } from 'quasar'
-import { useQuasar } from 'quasar'
+import { QField, QInput, QFile, QSelect, QOptionGroup, QSlider, QRange, QDate, QPopupProxy, QEditor } from 'quasar'
 import { UploadImage } from './use-image'
 
 /**
@@ -28,13 +27,15 @@ function dateRangeToStr(range) {
 }
 
 // 输入包裹
-function buildField(attr, input) {
+function buildField(attr, input, slots) {
     const { label, ...wrapAttr } = attr
     const labClass = 'text-subtitle1 no-pointer-events ellipsis';
-    return h(QField, { ...wrapAttr }, {
-        prepend: () => h('div', { class: labClass }, label),
-        control: () => input
-    })
+    const fieldPrepend = { ...slots, control: () => input };
+    if (label) {
+        fieldPrepend.prepend = () => h('div', { class: labClass }, label)
+    }
+
+    return h(QField, { ...wrapAttr }, fieldPrepend)
 }
 
 /**
@@ -44,9 +45,15 @@ function buildField(attr, input) {
  * @returns 
  */
 export function buildInput(innerValue, props, ctx) {
-    const { solts, emit } = ctx;
-    const { labelAffix, labelCol } = props;
+    const { slots, emit } = ctx;
+    const { labelAffix } = props;
+    // props传入的插槽
+    const propSlots = props.slots instanceof Object ? props.slots : { default: props.slots }
 
+    const inputSlots = {
+        ...slots,
+        ...propSlots
+    }
     // 更新值
     function emitValue(val) {
         innerValue.value = val;
@@ -71,12 +78,14 @@ export function buildInput(innerValue, props, ctx) {
     // 输入框
     switch (type) {
         case 'select':
+            const options = formatOptions(attrs.options);
+            const displayValue = options.filter(vo => vo.value === (attrs.modelValue))[0];
             input = h(QSelect, {
                 emitValue: true,
-                displayValue: attrs.options.filter(vo => vo.value === (attrs.modelValue))[0]?.label,
+                displayValue: displayValue ? displayValue[attrs.optionLabel || 'label'] : null,
                 ...attrs,
-                options: formatOptions(attrs.options),
-            });
+                options,
+            }, inputSlots);
             break;
 
         case 'checkbox':
@@ -84,7 +93,7 @@ export function buildInput(innerValue, props, ctx) {
             attrs.modelValue = attrs.modelValue || [];
         case 'radio':
             attrs.options = formatOptions(attrs.options);
-            input = buildField(attrs, h(QOptionGroup, { inline: true, ...attrs }));
+            input = buildField(attrs, h(QOptionGroup, { inline: true, ...attrs }, inputSlots));
             break;
 
         case 'range':
@@ -94,8 +103,8 @@ export function buildInput(innerValue, props, ctx) {
                 max: 100,
                 ...rangeAttrs,
                 modelValue: innerValue.value || { min: 20, max: 80 }
-            });
-            input = buildField(attrs, h('div', { class: 'col q-mx-sm' }, range));
+            }, inputSlots);
+            input = buildField(attrs, h('div', { class: 'col q-mx-sm' }, range), inputSlots);
             break;
         case 'slider':
             const { label: sliderLabel, ...slideAttrs } = attrs;
@@ -105,8 +114,8 @@ export function buildInput(innerValue, props, ctx) {
                 label: true,
                 ...slideAttrs,
                 modelValue: innerValue.value || 50
-            });
-            input = buildField(attrs, h('div', { class: 'col q-mx-sm' }, slider));
+            }, inputSlots);
+            input = buildField(attrs, h('div', { class: 'col q-mx-sm' }, slider), inputSlots);
             break;
 
         case 'date':
@@ -119,26 +128,26 @@ export function buildInput(innerValue, props, ctx) {
             input = buildField(attrs, [
                 dateRangeToStr(innerValue.value),
                 h(QPopupProxy, {}, { default: () => dateInput })
-            ])
+            ], inputSlots)
             break;
 
         case 'file':
-            input = h(QFile, { ...attrs, modelValue: innerValue.value || null });
+            input = h(QFile, { ...attrs, modelValue: innerValue.value || null }, inputSlots);
             break;
 
         case 'image':
-            input = h(UploadImage, { ...attrs, modelValue: innerValue.value || null });
+            input = h(UploadImage, { ...attrs, modelValue: innerValue.value || null }, inputSlots);
             break;
 
         case 'editor':
             input = h('div', {}, [
                 attrs.label ? h('label', { class: 'input-label' }, attrs.label) : null,
-                h(QEditor, { ...attrs, modelValue: innerValue.value })
+                h(QEditor, { ...attrs, modelValue: innerValue.value }, inputSlots)
             ]);
             break;
 
         default:
-            input = h(QInput, attrs);
+            input = h(QInput, attrs, inputSlots);
             break;
     }
     return input;

@@ -3,6 +3,15 @@
     <q-toggle v-model="attrs.labelAffix" label="label affix" />
     <q-toggle v-model="attrs.dense" label="dense" />
     <q-form class="q-gutter-md">
+      <!-- 插槽 -->
+      <build-input outlined v-bind="attrs" v-model="prms.input" label="带插槽" class="test1">
+        <template v-slot:append>
+          <q-icon name="search" />
+        </template>
+        <template v-slot:after>
+          <q-btn unelevated label="按扭" color="primary" />
+        </template>
+      </build-input>
       <!-- 普通文本 -->
       <build-input outlined v-bind="attrs" v-model="prms.input" label="用户名" class="test1" />
       <!-- 文件 -->
@@ -22,6 +31,7 @@
       <build-input outlined v-bind="attrs" v-model="prms.img_base64" label="单图base64" type="image" base64 />
       <build-input outlined v-bind="attrs" v-model="prms.image2" label="多图片" type="image" multiple />
       <build-input outlined v-bind="attrs" v-model="prms.editor" label="内容编辑" type="editor" />
+      
     </q-form>
 
     <div class="q-pa-sm">

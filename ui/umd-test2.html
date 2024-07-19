@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://suan.qxtky.com/static/qui/qui.min.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <div id="app">
+        <div class="q-pa-md q-gutter-sm">
+            <build-field v-model="prms" outlined :fields="fields" />
+        </div>
+        <div>--{{ prms }}--</div>
+    </div>
+
+    <!-- Add the following at the end of your body tag -->
+    <script type="text/javascript" src="https://suan.qxtky.com/static/qui/qui.vue.js"></script>
+
+    <script src="dist/index.umd.js"></script>
+    <link href="dist/index.css" rel="stylesheet" type="text/css">
+    <script>
+        
+        const {apiAjax} = initAxios();
+        console.log(apiAjax instanceof Function);
+        const app = createApp({
+            data() {
+                return {
+                    msg: 'Hello Vue!',
+                    prms: {},
+                    fields: [
+                        { name: 'avatar', label: '头像', type: 'image', base64: true },
+                        { name: 'name', label: '姓名' },
+                        { name: 'sex', label: '性别', type: 'radio', options: ['男', '女'] },
+                        { name: 'born', label: '生日', type: 'date' },
+                        { name: 'level', label: '级别', type: 'select', options: ['1级', '2级', '3级'] },
+                        { name: 'hobby', label: '爱好', type: 'checkbox', options: ['听音乐', '打蓝球', '看电影'] },
+                        { name: 'intro', label: '简介', type: 'editor' },
+                    ]
+                }
+            }
+        })
+
+        app.use(QuiPlus)
+        app.mount('#app')
+    </script>
+</body>
+
+</html>
